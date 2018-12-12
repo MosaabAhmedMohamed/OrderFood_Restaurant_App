@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Order Food Server</string>
+    <string name="desc">We transport Foods to customers as quickly as possible </string>
+    <string name="title_activity_home">Home</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_tracking_order">TrackingOrder</string>
+
+    <string name="default_notification_channel_id">CHANNEL_ID_1</string>
+
+    <string name="google_maps_key">AIzaSyBHeYujQokJeRCK03CdJBF3dQEWtXhOelo</string>
+
+</resources>
