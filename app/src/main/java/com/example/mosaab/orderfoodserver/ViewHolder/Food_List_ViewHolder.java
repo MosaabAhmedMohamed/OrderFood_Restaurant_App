@@ -12,7 +12,9 @@ import com.example.mosaab.orderfoodserver.Interfaces.ItemClickListner;
 import com.example.mosaab.orderfoodserver.R;
 
 
-public class Food_List_ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener ,View.OnCreateContextMenuListener  {
+public class Food_List_ViewHolder extends RecyclerView.ViewHolder implements
+        View.OnClickListener
+        ,View.OnCreateContextMenuListener  {
 
 
     public TextView  food_Name;

@@ -15,12 +15,36 @@
         android:layout_height="wrap_content">
 
         <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColorHint="@color/text_color_yeallo"
+            android:layout_marginTop="4dp"
+            >
+            <EditText
+                android:id="@+id/banner_newfood_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Food ID"
+                android:text=""
+                android:padding="2dp"
+                android:paddingStart="8dp"
+                android:inputType="textMultiLine"
+                android:background="@drawable/edt_btn_shape"
+                android:textColor="@color/text_color_dark"
+                android:textColorHint="@color/text_color_yeallo"
+                android:textSize="24sp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:paddingTop="8dp"
             android:textColorHint="@color/text_color_yeallo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <EditText
-                android:id="@+id/edtName"
+                android:id="@+id/banner_newfood_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="name"
@@ -36,76 +60,8 @@
                 />
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColorHint="@color/text_color_yeallo"
-            android:layout_marginTop="4dp"
-            >
-            <EditText
-                android:id="@+id/edtDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Description"
-                android:text=""
-                android:padding="2dp"
-                android:paddingStart="8dp"
-                android:inputType="textMultiLine"
-                android:background="@drawable/edt_btn_shape"
-                android:textColor="@color/text_color_dark"
-                android:textColorHint="@color/text_color_yeallo"
-                android:textSize="24sp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-               />
-        </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColorHint="@color/text_color_yeallo"
-            android:layout_marginTop="4dp">
-            <EditText
-                android:id="@+id/edtPrice"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:padding="2dp"
-                android:hint="Price"
-                android:text=""
-                android:inputType="number"
-                android:textColor="@color/text_color_dark"
-                android:textColorHint="@color/text_color_yeallo"
-                android:textSize="24sp"
-                android:background="@drawable/edt_btn_shape"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-               />
-        </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColorHint="@color/text_color_yeallo"
-            android:layout_marginTop="4dp">
-            <EditText
-                android:id="@+id/edtDiscount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:padding="2dp"
-                android:hint="Discount"
-                android:text=""
-                android:inputType="number"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/edt_btn_shape"
-                android:textColor="@color/text_color_dark"
-                android:textColorHint="@color/text_color_yeallo"
-                android:textSize="24sp"
-                />
-
-        </android.support.design.widget.TextInputLayout>
 
 
         <LinearLayout
@@ -139,7 +95,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/edtPassword"
                 app:layout_constraintVertical_bias="1.0"
-               />
+                />
             <Button
                 android:id="@+id/btnUpload"
                 android:layout_width="0dp"
@@ -162,7 +118,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/edtPassword"
                 app:layout_constraintVertical_bias="1.0"
-               />
+                />
 
         </LinearLayout>
     </LinearLayout>

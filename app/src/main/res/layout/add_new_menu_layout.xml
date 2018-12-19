@@ -15,28 +15,37 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edtName"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:hint="Name"
-            android:text=""
-            android:textColor="@color/text_color_yeallo"
-            android:textColorHint="@color/text_color_bright"
-            android:textSize="34sp"
-            app:met_baseColor="@color/text_color_bright"
-            app:met_floatingLabel="highlight"
-            app:met_maxCharacters="11"
-            android:backgroundTint="@color/text_color_yeallo"
-            app:met_primaryColor="@color/text_color_yeallo"
-            app:met_singleLineEllipsis="true" />
+            android:textColorHint="@color/text_color_yeallo"
+            >
+            <EditText
+                android:id="@+id/edtName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Name"
+                android:paddingStart="8dp"
+                android:padding="2dp"
+                android:text=""
+                android:textColor="@color/text_color_dark"
+                android:textColorHint="@color/text_color_yeallo"
+                android:textSize="24sp"
+                android:background="@drawable/edt_btn_shape"
+                />
+
+        </android.support.design.widget.TextInputLayout>
 
         <LinearLayout
             android:weightSum="2"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -52,7 +61,7 @@
                 android:layout_marginBottom="8dp"
                 android:shadowRadius="4"
                 android:text="SELECT"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:textAllCaps="false"
                 android:background="@drawable/btn_shape"
@@ -77,7 +86,7 @@
                 android:text="UPLOAD"
                 android:textAllCaps="false"
                 android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 android:background="@drawable/border_button_shape"
                 android:textColor="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="parent"

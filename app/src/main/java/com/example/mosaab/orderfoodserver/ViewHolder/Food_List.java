@@ -18,7 +18,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.mosaab.orderfoodserver.Common.Common;
@@ -26,20 +28,19 @@ import com.example.mosaab.orderfoodserver.Interfaces.ItemClickListner;
 import com.example.mosaab.orderfoodserver.R;
 import com.example.mosaab.orderfoodserver.model.Foods;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 
 import java.util.UUID;
-
-import info.hoang8f.widget.FButton;
 
 public class Food_List extends AppCompatActivity {
 
@@ -51,7 +52,7 @@ public class Food_List extends AppCompatActivity {
 
     //firebase
     private FirebaseDatabase database;
-    private DatabaseReference foodList;
+    private DatabaseReference foodList_table;
     private FirebaseStorage storage;
     private StorageReference storageReference;
 
@@ -59,7 +60,7 @@ public class Food_List extends AppCompatActivity {
     private String CategoryId ="";
     private FirebaseRecyclerAdapter <Foods,Food_List_ViewHolder> adapter;
 
-    private MaterialEditText edt_name,edt_Description,edt_price,edt_Discount;
+    private EditText edt_name,edt_Description,edt_price,edt_Discount;
     private Button btnSelect,btnUpload;
 
     private final int Pick_Image_Request =71;
@@ -90,7 +91,7 @@ public class Food_List extends AppCompatActivity {
 
         //Firebase
         database = FirebaseDatabase.getInstance();
-        foodList =database.getReference("Foods");
+        foodList_table =database.getReference("Foods");
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
@@ -164,7 +165,7 @@ public class Food_List extends AppCompatActivity {
 
                 if(newFoods !=null)
                 {
-                    foodList.push().setValue(newFoods);
+                    foodList_table.push().setValue(newFoods);
                     Snackbar.make(rootLayout,"New Foods "+ newFoods.getName()+"was addes",Snackbar.LENGTH_SHORT).show();
                 }
 
@@ -183,32 +184,46 @@ public class Food_List extends AppCompatActivity {
     }
 
     private void loadListFood(String categoryId) {
-        adapter = new FirebaseRecyclerAdapter<Foods, Food_List_ViewHolder>(
-                Foods.class,
-                R.layout.food_item,
-                Food_List_ViewHolder.class,
-                foodList.orderByChild("MenuId").equalTo(categoryId))
-        {
-            @Override
-            protected void populateViewHolder(Food_List_ViewHolder viewHolder, Foods model, int position) {
 
+        //to filter search
+        Query Category = foodList_table.orderByChild("MenuId").equalTo(categoryId.toString());
+
+        FirebaseRecyclerOptions options =new FirebaseRecyclerOptions.Builder<Foods>()
+                .setQuery(Category,Foods.class)
+                .build();
+
+        adapter = new FirebaseRecyclerAdapter<Foods, Food_List_ViewHolder>(options)
+        {
+            @NonNull
+            @Override
+            public Food_List_ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+                View item_view  = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.food_item,viewGroup,false);
+
+                return new Food_List_ViewHolder(item_view);
+            }
+
+            @Override
+            protected void onBindViewHolder(@NonNull Food_List_ViewHolder viewHolder, int position, @NonNull Foods model) {
                 viewHolder.food_Name.setText(model.getName());
 
-                Picasso.with(getBaseContext()).load(model.getImage())
+                Picasso.get().load(model.getImage())
                         .into(viewHolder.food_image);
 
                 viewHolder.setItemClickListner(new ItemClickListner() {
                     @Override
-                    public void onClick(View view, int postion, boolean isLingClick) {
+                    public void onClick(View view, int postion, boolean isLongClick) {
 
 
                     }
                 });
             }
         };
+        adapter.startListening();
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
     }
+
 
     private void UploadImage() {
 
@@ -302,7 +317,7 @@ public class Food_List extends AppCompatActivity {
     }
 
     private void DeleteFood(String key) {
-    foodList.child(key).removeValue();
+    foodList_table.child(key).removeValue();
     }
 
     private void ShowUpdateFoodDialog(final String key, final Foods item) {
@@ -358,7 +373,7 @@ public class Food_List extends AppCompatActivity {
                     item.setDiscount(edt_Discount.getText().toString());
                     item.setDescription(edt_Description.getText().toString());
 
-                    foodList.child(key).setValue(item);
+                    foodList_table.child(key).setValue(item);
 
                     Snackbar.make(rootLayout,"category "+item.getName()+"was edited",Snackbar.LENGTH_SHORT).show();
 
@@ -420,5 +435,20 @@ public class Food_List extends AppCompatActivity {
         }
 
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (adapter != null)
+        {
+            adapter.startListening();
+        }
     }
 }

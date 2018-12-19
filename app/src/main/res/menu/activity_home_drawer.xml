@@ -10,9 +10,9 @@
             android:title="Menu" />
 
         <item
-            android:id="@+id/nav_cart"
-            android:icon="@drawable/ic_shopping_cart_black_24dp"
-            android:title="Cart" />
+            android:id="@+id/nav_add_banner"
+            android:icon="@drawable/ic_add_to_banner_black_24dp"
+            android:title="Add To Banner" />
 
         <item
             android:id="@+id/nav_orders"

@@ -10,20 +10,21 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.mosaab.orderfoodserver.Common.Common;
-import com.example.mosaab.orderfoodserver.Interfaces.ItemClickListner;
 import com.example.mosaab.orderfoodserver.R;
 import com.example.mosaab.orderfoodserver.Remote.API_Service;
+import com.example.mosaab.orderfoodserver.model.Foods;
 import com.example.mosaab.orderfoodserver.model.Notification_;
 import com.example.mosaab.orderfoodserver.model.Request;
 import com.example.mosaab.orderfoodserver.model.Response;
 import com.example.mosaab.orderfoodserver.model.Sender;
 import com.example.mosaab.orderfoodserver.model.Token;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.database.DataSnapshot;
@@ -38,28 +39,29 @@ import retrofit2.Callback;
 
 public class Order_Status extends AppCompatActivity {
 
-    public static final String TAG ="Order_Status_Activity";
-    public static final int Error_Dialog_request =9001;
+    public static final String TAG = "Order_Status_Activity";
+    public static final int Error_Dialog_request = 9001;
 
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private MaterialSpinner spinner;
 
-    private FirebaseRecyclerAdapter<Request,Order_Status_ViewHolder> adpater;
+    private FirebaseRecyclerAdapter<Request, Order_Status_ViewHolder> adpater;
     private FirebaseDatabase db;
-    private DatabaseReference requests;
+    private DatabaseReference requests_table;
 
     private API_Service api_service;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order__status);
 
         db = FirebaseDatabase.getInstance();
-        requests =db.getReference("Requests");
+        requests_table = db.getReference("Requests");
 
-        api_service =Common.Get_FCMClint();
+        api_service = Common.Get_FCMClint();
 
         recyclerView = findViewById(R.id.ListOrders);
         recyclerView.setHasFixedSize(true);
@@ -72,68 +74,77 @@ public class Order_Status extends AppCompatActivity {
 
     private void loadOrders() {
 
-        adpater = new FirebaseRecyclerAdapter<Request,Order_Status_ViewHolder>(
-                Request.class,
-                R.layout.order_layout,
-                Order_Status_ViewHolder.class,
-                requests)
+        FirebaseRecyclerOptions options =new FirebaseRecyclerOptions.Builder<Request>()
+                .setQuery(requests_table,Request.class)
+                .build();
+
+        adpater = new FirebaseRecyclerAdapter<Request, Order_Status_ViewHolder>(options)
         {
 
+            @NonNull
+            @Override
+            public Order_Status_ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+
+                View item_View = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.order_layout,viewGroup,false);
+                return new Order_Status_ViewHolder(item_View);
+            }
 
             @Override
-            protected void populateViewHolder(Order_Status_ViewHolder viewHolder, final Request model, final int position) {
-                  viewHolder.txtOrderId.setText(adpater.getRef(position).getKey());
-                  viewHolder.txtOrderStauts.setText(Common.convertCodeToString(model.getStatus()));
-                  viewHolder.txtOrderAddress.setText(model.getAdress());
-                  viewHolder.txtOrderPhone.setText(model.getPhone());
+            protected void onBindViewHolder(@NonNull Order_Status_ViewHolder viewHolder, final int position, @NonNull final Request model) {
+                viewHolder.txtOrderId.setText(adpater.getRef(position).getKey());
+                viewHolder.txtOrderStauts.setText(Common.convertCodeToString(model.getStatus()));
+                viewHolder.txtOrderAddress.setText(model.getAdress());
+                viewHolder.txtOrderPhone.setText(model.getPhone());
+                viewHolder.txtOrder_Date.setText(Common.getDate(Long.parseLong(adpater.getRef(position).getKey())));
 
-                  viewHolder.Detail_BU.setOnClickListener(new View.OnClickListener() {
-                      @Override
-                      public void onClick(View v) {
-                          Intent order_detail_intent = new Intent(Order_Status.this,Order_Detial.class);
-                          Common.currentRequest = model;
-                          order_detail_intent.putExtra("OrderId",adpater.getRef(position).getKey());
-                          startActivity(order_detail_intent);
-                      }
-                  });
+                viewHolder.Detail_BU.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent order_detail_intent = new Intent(Order_Status.this, Order_Detial.class);
+                        Common.currentRequest = model;
+                        order_detail_intent.putExtra("OrderId", adpater.getRef(position).getKey());
+                        startActivity(order_detail_intent);
+                    }
+                });
 
-                  viewHolder.Remove_BU.setOnClickListener(new View.OnClickListener() {
-                      @Override
-                      public void onClick(View v) {
-                          deleteOrder(adpater.getRef(position).getKey());
-                      }
-                  });
+                viewHolder.Remove_BU.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        deleteOrder(adpater.getRef(position).getKey());
+                    }
+                });
 
-                  viewHolder.Edit_Bu.setOnClickListener(new View.OnClickListener() {
-                      @Override
-                      public void onClick(View v) {
-                          ShowUpdateDialog(adpater.getRef(position).getKey(), adpater.getItem(position));
+                viewHolder.Edit_Bu.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ShowUpdateDialog(adpater.getRef(position).getKey(), adpater.getItem(position));
 
-                      }
-                  });
+                    }
+                });
 
-                  viewHolder.Derication_BU.setOnClickListener(new View.OnClickListener() {
-                      @Override
-                      public void onClick(View v) {
-                          if (isServiceSDk())
-                          {
-                              Intent Tracking_order_intent = new Intent(Order_Status.this, TrackingOrder.class);
-                              Common.currentRequest = model;
-                              startActivity(Tracking_order_intent);
-                          }
-                      }
-                  });
+                viewHolder.Derication_BU.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (isServiceSDk()) {
+                            Intent Tracking_order_intent = new Intent(Order_Status.this, TrackingOrder.class);
+                            Common.currentRequest = model;
+                            startActivity(Tracking_order_intent);
+                        }
+                    }
+                });
 
-    }
+            }
         };
 
+        adpater.startListening();
         adpater.notifyDataSetChanged();
         recyclerView.setAdapter(adpater);
     }
 
 
     private void deleteOrder(String key) {
-        requests.child(key).removeValue();
+        requests_table.child(key).removeValue();
         adpater.notifyDataSetChanged();
     }
 
@@ -159,7 +170,7 @@ public class Order_Status extends AppCompatActivity {
                 dialog.dismiss();
                 item.setStatus(String.valueOf(spinner.getSelectedIndex()));
 
-                requests.child(localKey).setValue(item);
+                requests_table.child(localKey).setValue(item);
 
                 adpater.notifyDataSetChanged();
                 Send_Order_Status_ToUSer(localKey,item);
@@ -232,7 +243,7 @@ public class Order_Status extends AppCompatActivity {
 
         if (available == ConnectionResult.SUCCESS)
         {
-            //everything is fine and the user can make map requests
+            //everything is fine and the user can make map requests_table
 
             Log.d(TAG, "isServiceOk: Google play serviecs is working ");
             return true;
@@ -248,8 +259,24 @@ public class Order_Status extends AppCompatActivity {
         }
         else
         {
-            Toast.makeText(this, "you cant map requests", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "you cant map requests_table", Toast.LENGTH_SHORT).show();
         }
         return false;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adpater.stopListening();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (adpater != null)
+        {
+            adpater.startListening();
+        }
     }
 }

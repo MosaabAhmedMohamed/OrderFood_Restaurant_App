@@ -12,7 +12,7 @@ import com.example.mosaab.orderfoodserver.R;
 
 public class Order_Status_ViewHolder extends RecyclerView.ViewHolder  {
 
-    public TextView txtOrderId, txtOrderStauts, txtOrderPhone, txtOrderAddress;
+    public TextView txtOrderId, txtOrderStauts, txtOrderPhone, txtOrderAddress,txtOrder_Date;
     public Button Edit_Bu,Remove_BU,Detail_BU,Derication_BU;
 
 
@@ -22,6 +22,7 @@ public class Order_Status_ViewHolder extends RecyclerView.ViewHolder  {
 
         txtOrderAddress = itemView.findViewById(R.id.Order_address);
         txtOrderId = itemView.findViewById(R.id.order_name);
+        txtOrder_Date = itemView.findViewById(R.id.order_date);
         txtOrderStauts = itemView.findViewById(R.id.Order_status);
         txtOrderPhone = itemView.findViewById(R.id.Order_Phone);
 

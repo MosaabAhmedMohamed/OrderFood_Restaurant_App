@@ -18,13 +18,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.rey.material.widget.CheckBox;
 
-import info.hoang8f.widget.FButton;
+import io.paperdb.Paper;
+
 
 public class SignIn extends AppCompatActivity {
 
     private EditText et_phone,et_password;
     private Button btnSignIN;
+    private CheckBox checkBox_remember_me ;
 
     private FirebaseDatabase db;
     private DatabaseReference databaseReference;
@@ -65,11 +68,20 @@ public class SignIn extends AppCompatActivity {
         et_password =findViewById(R.id.edtPassword);
         btnSignIN =findViewById(R.id.btn_SingIn);
 
+        Paper.init(this);
+        checkBox_remember_me = findViewById(R.id.checkbox_remember);
+
         db=FirebaseDatabase.getInstance();
         databaseReference= db.getReference("User");
     }
 
     private void SignInUser(String PhoneTxt, String PasswordTxt) {
+
+        if (checkBox_remember_me.isChecked())
+        {
+            Paper.book().write(Common.USER_KEY,et_phone.getText().toString());
+            Paper.book().write(Common.PWD_KEY,et_password.getText().toString());
+        }
 
         final ProgressDialog mDialog = new ProgressDialog(SignIn.this);
         mDialog.setMessage("pleas Wait...");

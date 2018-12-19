@@ -9,14 +9,18 @@ import com.example.mosaab.orderfoodserver.Remote.FCMRetrofitClient;
 import com.example.mosaab.orderfoodserver.model.Request;
 import com.example.mosaab.orderfoodserver.model.User;
 
+import java.util.Locale;
+
 public class Common {
 
     public static User current_user;
     public static Request currentRequest;
-
+    public static String PHONE_TEXT ="userPhone";
     public static final String UPDATE ="Update";
     public static final String DELETE ="Delete";
 
+    public static final String USER_KEY ="User";
+    public static final String PWD_KEY ="Password";
 
     public static final String BASE_URL = "https://fcm.googleapis.com/";
 
@@ -56,7 +60,14 @@ public class Common {
         return FCMRetrofitClient.getClient(BASE_URL).create(API_Service.class);
     }
 
-
+    public static String getDate(Long time)
+    {
+        java.util.Calendar calendar = java.util.Calendar.getInstance(Locale.ENGLISH);
+        calendar.setTimeInMillis(time);
+        StringBuilder date = new StringBuilder(
+                android.text.format.DateFormat.format("dd-MM-yy HH:mm",calendar).toString());
+        return date.toString();
+    }
 
 
 }

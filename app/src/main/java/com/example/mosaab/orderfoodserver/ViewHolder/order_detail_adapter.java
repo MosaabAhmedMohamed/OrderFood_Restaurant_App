@@ -12,21 +12,9 @@ import com.example.mosaab.orderfoodserver.model.order;
 
 import java.util.List;
 
-class Order_Detail_ViewHolder extends RecyclerView.ViewHolder{
 
-    public TextView name,quantity,price,discount;
 
-    public Order_Detail_ViewHolder(@NonNull View itemView) {
-        super(itemView);
-
-        name = itemView.findViewById(R.id.product_name);
-        quantity = itemView.findViewById(R.id.product_quantity);
-        price = itemView.findViewById(R.id.product_price);
-        discount = itemView.findViewById(R.id.product_discount);
-    }
-}
-
-public class order_detail_adapter extends RecyclerView.Adapter<Order_Detail_ViewHolder> {
+public class order_detail_adapter extends RecyclerView.Adapter<order_detail_adapter.Order_Detail_ViewHolder> {
 
     List<order> myOrders;
 
@@ -58,5 +46,19 @@ public class order_detail_adapter extends RecyclerView.Adapter<Order_Detail_View
     @Override
     public int getItemCount() {
         return myOrders.size();
+    }
+
+    class Order_Detail_ViewHolder extends RecyclerView.ViewHolder{
+
+        public TextView name,quantity,price,discount;
+
+        public Order_Detail_ViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            name = itemView.findViewById(R.id.product_name);
+            quantity = itemView.findViewById(R.id.product_quantity);
+            price = itemView.findViewById(R.id.product_price);
+            discount = itemView.findViewById(R.id.product_discount);
+        }
     }
 }
