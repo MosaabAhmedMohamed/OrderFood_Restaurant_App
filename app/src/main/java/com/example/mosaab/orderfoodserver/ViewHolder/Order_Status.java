@@ -92,11 +92,11 @@ public class Order_Status extends AppCompatActivity {
 
             @Override
             protected void onBindViewHolder(@NonNull Order_Status_ViewHolder viewHolder, final int position, @NonNull final Request model) {
-                viewHolder.txtOrderId.setText(adpater.getRef(position).getKey());
-                viewHolder.txtOrderStauts.setText(Common.convertCodeToString(model.getStatus()));
-                viewHolder.txtOrderAddress.setText(model.getAdress());
-                viewHolder.txtOrderPhone.setText(model.getPhone());
-                viewHolder.txtOrder_Date.setText(Common.getDate(Long.parseLong(adpater.getRef(position).getKey())));
+                viewHolder.txtOrderId.setText("ID : "+adpater.getRef(position).getKey());
+                viewHolder.txtOrderStauts.setText("Status : "+Common.convertCodeToString(model.getStatus()));
+                viewHolder.txtOrderAddress.setText("Address : "+model.getAdress());
+                viewHolder.txtOrderPhone.setText("Phone : "+model.getPhone());
+                viewHolder.txtOrder_Date.setText("Date : "+Common.getDate(Long.parseLong(adpater.getRef(position).getKey())));
 
                 viewHolder.Detail_BU.setOnClickListener(new View.OnClickListener() {
                     @Override

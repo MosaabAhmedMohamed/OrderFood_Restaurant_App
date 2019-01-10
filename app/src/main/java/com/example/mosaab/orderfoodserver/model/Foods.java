@@ -18,13 +18,13 @@ public class Foods {
     }
 
 
-    public Foods(String name, String image, String description, String price, String discount, String menuId) {
+    public Foods(String name, String image, String description, String price, String discount, String MenuId) {
         Name = name;
         Image = image;
         Description = description;
         Price = price;
         Discount = discount;
-        MenuId = menuId;
+        this.MenuId = MenuId;
     }
 
     public String getName() {
@@ -71,7 +71,7 @@ public class Foods {
         return MenuId;
     }
 
-    public void setMenuId(String menuId) {
-        MenuId = menuId;
+    public void setMenuId(String MenuId) {
+        this.MenuId = MenuId;
     }
 }

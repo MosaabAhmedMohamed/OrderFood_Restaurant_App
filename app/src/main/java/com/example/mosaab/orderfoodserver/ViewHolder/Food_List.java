@@ -1,8 +1,10 @@
 package com.example.mosaab.orderfoodserver.ViewHolder;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -10,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -40,6 +44,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Food_List extends AppCompatActivity {
@@ -49,6 +55,8 @@ public class Food_List extends AppCompatActivity {
     private FloatingActionButton fab;
 
     private ConstraintLayout rootLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
 
     //firebase
     private FirebaseDatabase database;
@@ -63,6 +71,9 @@ public class Food_List extends AppCompatActivity {
     private EditText edt_name,edt_Description,edt_price,edt_Discount;
     private Button btnSelect,btnUpload;
 
+
+    //vars
+    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE =900 ;
     private final int Pick_Image_Request =71;
     private Uri saveImageUri;
 
@@ -101,8 +112,30 @@ public class Food_List extends AppCompatActivity {
         layoutManager =new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
+        swipeRefreshLayout = findViewById(R.id.home_layout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh()
+            {
+                check_internet_connection();
+            }
+        });
+
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run()
+            {
+                check_internet_connection();
+            }
+        });
+
         fab = findViewById(R.id.fab);
     }
+
 
     private void check_internet_connection()
     {
@@ -110,7 +143,8 @@ public class Food_List extends AppCompatActivity {
         {
             if(getIntent()!=null)
             {
-                CategoryId =getIntent().getStringExtra("CategoryId");
+                CategoryId = getIntent().getStringExtra("CategoryId");
+
                 if(!CategoryId.isEmpty()) {
                     loadListFood(CategoryId);
                 }
@@ -144,7 +178,18 @@ public class Food_List extends AppCompatActivity {
         btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChooseImage();//let user select image to upload it to firesbase
+
+                if(Common.READ_EXTRNAL_STORAGE(Food_List.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)) {
+                    ChooseImage();//let user select image to upload it to firesbase
+                }
+                else if (!Common.READ_EXTRNAL_STORAGE(Food_List.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE))
+                {
+
+                    ActivityCompat.requestPermissions(Food_List.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
+                }
             }
         });
 
@@ -166,7 +211,8 @@ public class Food_List extends AppCompatActivity {
                 if(newFoods !=null)
                 {
                     foodList_table.push().setValue(newFoods);
-                    Snackbar.make(rootLayout,"New Foods "+ newFoods.getName()+"was addes",Snackbar.LENGTH_SHORT).show();
+                    loadListFood(CategoryId);
+                    Snackbar.make(swipeRefreshLayout,"New Foods "+ newFoods.getName()+"was added",Snackbar.LENGTH_SHORT).show();
                 }
 
             }
@@ -186,7 +232,10 @@ public class Food_List extends AppCompatActivity {
     private void loadListFood(String categoryId) {
 
         //to filter search
-        Query Category = foodList_table.orderByChild("MenuId").equalTo(categoryId.toString());
+
+      //  order_category.add("MenuId");
+      //  order_category.add("menuId");
+        Query Category = foodList_table.orderByChild("menuId").equalTo(categoryId);
 
         FirebaseRecyclerOptions options =new FirebaseRecyclerOptions.Builder<Foods>()
                 .setQuery(Category,Foods.class)
@@ -222,6 +271,7 @@ public class Food_List extends AppCompatActivity {
         adapter.startListening();
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 
@@ -348,7 +398,18 @@ public class Food_List extends AppCompatActivity {
         btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChooseImage();//let user select image to upload it to firesbase
+
+                if(Common.READ_EXTRNAL_STORAGE(Food_List.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)) {
+                    ChooseImage();//let user select image to upload it to firesbase
+                }
+                else if (!Common.READ_EXTRNAL_STORAGE(Food_List.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE))
+                {
+
+                    ActivityCompat.requestPermissions(Food_List.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
+                }
             }
         });
 
@@ -368,14 +429,15 @@ public class Food_List extends AppCompatActivity {
                 dialog.dismiss();
 
 
-                    item.setImage(edt_name.getText().toString());
+                    item.setName(edt_name.getText().toString());
                     item.setPrice(edt_price.getText().toString());
                     item.setDiscount(edt_Discount.getText().toString());
                     item.setDescription(edt_Description.getText().toString());
 
+
                     foodList_table.child(key).setValue(item);
 
-                    Snackbar.make(rootLayout,"category "+item.getName()+"was edited",Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(swipeRefreshLayout,"category "+item.getName()+"was edited",Snackbar.LENGTH_SHORT).show();
 
 
             }
@@ -449,6 +511,31 @@ public class Food_List extends AppCompatActivity {
         if (adapter != null)
         {
             adapter.startListening();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    ChooseImage();
+                }
+                else {
+
+                    Toast.makeText(this, "permission denied", Toast.LENGTH_SHORT).show();
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
         }
     }
 }

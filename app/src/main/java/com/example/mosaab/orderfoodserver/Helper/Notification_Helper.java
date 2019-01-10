@@ -57,7 +57,7 @@ public class Notification_Helper extends ContextWrapper
                 .setContentIntent(contentIntent)
                 .setContentTitle(title)
                 .setContentText(body)
-                .setSmallIcon(R.drawable.logo)
+                .setSmallIcon(R.mipmap.logo)
                 .setSound(soundUri)
                 .setContentInfo("Info")
                 .setWhen(System.currentTimeMillis())

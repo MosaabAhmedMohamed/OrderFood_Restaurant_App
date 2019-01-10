@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,14 +14,12 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:gravity="center"
-        android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:textColorHint="@color/text_color_yeallo"
-       >
+        >
 
         <EditText
-            android:id="@+id/edtPhone"
+            android:id="@+id/edtPhone_shipper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/border_edt_btn_shape"
@@ -42,6 +39,39 @@
 
 
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/edt_name_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/edt_phone_layout"
+        android:textColorHint="@color/text_color_yeallo"
+        >
+
+        <EditText
+            android:id="@+id/edtName_shipper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border_edt_btn_shape"
+            android:drawableRight="@drawable/ic_perm_identity_black_24dp"
+            android:hint="Name"
+            android:inputType="text"
+            android:padding="2dp"
+            android:layout_marginTop="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="32dp"
+            android:text="Ahmed"
+            android:textColor="@android:color/white"
+            android:textColorHint="@color/text_color_yeallo"
+            android:textSize="34sp"
+
+            />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
         android:id="@+id/edtPassword_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,10 +82,10 @@
         android:padding="2dp"
         android:layout_centerHorizontal="true"
         android:textColorHint="@color/text_color_yeallo"
-      android:layout_below="@id/edt_phone_layout">
+        android:layout_below="@id/edt_name_layout">
 
         <EditText
-            android:id="@+id/edtPassword"
+            android:id="@+id/edtPassword_shipper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -73,36 +103,7 @@
             android:textSize="34sp" />
     </android.support.design.widget.TextInputLayout>
 
-    <com.rey.material.widget.CheckBox
-        android:id="@+id/checkbox_remember"
-        style="@style/Material.Drawable.CheckBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edtPassword_layout"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="8dp"
-        android:layout_marginBottom="8dp"
-        android:backgroundTint="@android:color/black"
-        android:gravity="center_vertical"
-        android:text="Remember me"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        app:cbd_strokeColor="@android:color/white"
-        app:cbd_tickColor="@color/text_color_yeallo" />
 
-    <Button
-        android:id="@+id/btn_SingIn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edtPassword_layout"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="38dp"
-        android:background="@drawable/btn_shape"
-        android:layout_centerHorizontal="true"
-        android:shadowRadius="4"
-        android:text="Sign In"
-        android:textColor="@android:color/white" />
+
 
 </RelativeLayout>

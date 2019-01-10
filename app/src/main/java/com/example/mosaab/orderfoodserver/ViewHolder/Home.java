@@ -13,8 +13,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +31,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -86,6 +88,8 @@ public class Home extends AppCompatActivity implements
     private RecyclerView recycler_menu;
     private DotsIndicator dotsIndicator;
     private LinearLayout delete_update_layout;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
 
 
 
@@ -123,16 +127,6 @@ public class Home extends AppCompatActivity implements
                 ShowDialog_Menu();
             }
         });
-
-        if(Common.isConnectedToInternet(getApplicationContext()))
-        {   Setup_Slider();
-            LoadMenu();
-            Update_Token(FirebaseInstanceId.getInstance().getToken());
-        }
-        else {
-            Toast.makeText(Home.this, "Please check your internet connection !!", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
 
 
@@ -181,6 +175,7 @@ public class Home extends AppCompatActivity implements
         storage = FirebaseStorage.getInstance();
         storageReference =storage.getReference("images");
 
+        inflate_Recycler_View();
 
         Paper.init(this);
 
@@ -195,6 +190,27 @@ public class Home extends AppCompatActivity implements
 
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        swipeRefreshLayout = findViewById(R.id.home_layout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh()
+            {
+                check_intrnet();
+            }
+        });
+
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run()
+            {
+                check_intrnet();
+            }
+        });
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -213,10 +229,30 @@ public class Home extends AppCompatActivity implements
 
         //init recycler
         recycler_menu = findViewById(R.id.recycler_menu);
-        recycler_menu.setHasFixedSize(true);
         recycler_menu.setLayoutManager(new GridLayoutManager(this,2));
+
+        LayoutAnimationController controller = AnimationUtils.loadLayoutAnimation(recycler_menu.getContext(),R.anim.layout_fall_down);
+        recycler_menu.setLayoutAnimation(controller);
+
         Log.d(TAG, "InitUI: "+Common.current_user.getPhone());
     }
+
+    private void check_intrnet() {
+
+
+        if(Common.isConnectedToInternet(getApplicationContext()))
+        {
+            Setup_Slider();
+            LoadMenu();
+            Update_Token(FirebaseInstanceId.getInstance().getToken());
+        }
+        else {
+            Toast.makeText(Home.this, "Please check your internet connection !!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+    }
+
 
     private void ShowDialog_Menu() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(Home.this,R.style.MyDialogTheme);
@@ -235,7 +271,18 @@ public class Home extends AppCompatActivity implements
         btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChooseImage();//let user select image to upload it to firesbase
+
+                if(Common.READ_EXTRNAL_STORAGE(Home.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)) {
+                    ChooseImage();//let user select image to upload it to firesbase
+                }
+                else if (!Common.READ_EXTRNAL_STORAGE(Home.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE))
+                {
+
+                    ActivityCompat.requestPermissions(Home.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
+                }
             }
         });
 
@@ -298,7 +345,21 @@ public class Home extends AppCompatActivity implements
                     imageFolder.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            newCategory  = new Category(editName.getText().toString(),uri.toString());
+
+                            imageFolder.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    newCategory  = new Category();
+                                    newCategory.setName(editName.getText().toString());
+                                    newCategory.setLink(uri.toString());
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                    Toast.makeText(Home.this, "Error "+ e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
                         }
                     });
@@ -433,47 +494,17 @@ public class Home extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(Home.this, "ads", Toast.LENGTH_SHORT).show();
-                if (Build.VERSION.SDK_INT >= 23){
-                    // Here, thisActivity is the current activity
-                    if (ContextCompat.checkSelfPermission(Home.this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED) {
-
-                        // Should we show an explanation?
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(Home.this,
-                                Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-                            // Show an expanation to the user *asynchronously* -- don't block
-                            // this thread waiting for the user's response! After the user
-                            // sees the explanation, try again to request the permission.
-
-                        } else {
-
-                            // No explanation needed, we can request the permission.
-
-                            ActivityCompat.requestPermissions(Home.this,
-                                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-
-                            // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
-                            // app-defined int constant. The callback method gets the
-                            // result of the request.
-                        }
-                    }else{
-                        ActivityCompat.requestPermissions(Home.this,
-                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                    }
-                }else {
-
-                  ChooseImage();
+                if(Common.READ_EXTRNAL_STORAGE(Home.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)) {
+                    ChooseImage();//let user select image to upload it to firesbase
                 }
+                else if (!Common.READ_EXTRNAL_STORAGE(Home.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE))
+                {
 
+                    ActivityCompat.requestPermissions(Home.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
 
-
-
-
+                }
 
             }
         });
@@ -593,7 +624,18 @@ public class Home extends AppCompatActivity implements
         btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChooseImage();//let user select image to upload it to firesbase
+
+                if(Common.READ_EXTRNAL_STORAGE(Home.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)) {
+                    ChooseImage();//let user select image to upload it to firesbase
+                }
+                else if (!Common.READ_EXTRNAL_STORAGE(Home.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE))
+                {
+
+                    ActivityCompat.requestPermissions(Home.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
+                }
             }
         });
 
@@ -652,30 +694,8 @@ public class Home extends AppCompatActivity implements
         alertDialog.show();
 
     }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                    ChooseImage();
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-        }
-    }
-
-    private void LoadMenu() {
+    private void inflate_Recycler_View() {
 
         FirebaseRecyclerOptions options =new FirebaseRecyclerOptions.Builder<Category>()
                 .setQuery(categories_table,Category.class)
@@ -709,9 +729,20 @@ public class Home extends AppCompatActivity implements
                 });
             }
         };
+    }
+
+    private void LoadMenu() {
+
+
         adapter.startListening();
         adapter.notifyDataSetChanged();
         recycler_menu.setAdapter(adapter);
+        swipeRefreshLayout.setRefreshing(false);
+
+
+        //animation
+        recycler_menu.getAdapter().notifyDataSetChanged();
+        recycler_menu.scheduleLayoutAnimation();
     }
 
     @Override
@@ -764,6 +795,10 @@ public class Home extends AppCompatActivity implements
         else if(id == R.id.nav_contact_us)
         {
             Contact_Us();
+        }
+        else if(id == R.id.nav_shipper_managment)
+        {
+            startActivity(new Intent(Home.this,ShipperManagment.class));
         }
         else if(id == R.id.nav_sign_out)
         {
@@ -848,7 +883,18 @@ public class Home extends AppCompatActivity implements
         btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChooseImage();//let user select image to upload it to firesbase
+
+                if(Common.READ_EXTRNAL_STORAGE(Home.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE)) {
+                    ChooseImage();//let user select image to upload it to firesbase
+                }
+                else if (!Common.READ_EXTRNAL_STORAGE(Home.this,MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE))
+                {
+
+                    ActivityCompat.requestPermissions(Home.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
+                }
             }
         });
 
@@ -1059,5 +1105,29 @@ public class Home extends AppCompatActivity implements
             }
         });
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    ChooseImage();
+                } else {
+
+                    Toast.makeText(this, "permission denied", Toast.LENGTH_SHORT).show();
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+        }
     }
 }
